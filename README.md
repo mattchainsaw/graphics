@@ -8,7 +8,7 @@ CSCI 3820 - Computer Graphics
 **[Overview](#overview)**  
 **[Controls](#controls)**  
 **[Requirements](#requirements)**   
-**[Design](#turn-actions)**  
+**[Design](#design)**  
 
 ## Overview
 Port Hole is an open source, in browser game that was inspired by the game [Portal][2] by [Valve][3]. This in way is a copy of the game, but the mechanics are similar. The game will be a first person shooter where the player may place two different port holes on the level map. If the player has both port holes on the map, the player may go through them to get to different areas of the map. The game will be in a puzzle platform style, where the player must get through one level at a time.
@@ -49,7 +49,7 @@ There will be two key distinct environments: Port hole enabled and port hole dis
 #### Physics
 The physics of the game will be simple. The player will be affected by gravity and have momentum. The momentum will increase as the player falls down and increase as the player falls up. The momentum will carry through as a player passes through a port hole, and will stop if the player collides with the wall or floor.
 
-[1]: (http://turing.slu.edu/~mmeyer71/csci3820/)
-[2]: (https://en.wikipedia.org/wiki/Portal_%28video_game%29)
-[3]: (http://www.valvesoftware.com/)
-[4]: (http://threejs.org/)
+[1]: http://turing.slu.edu/~mmeyer71/csci3820/
+[2]: https://en.wikipedia.org/wiki/Portal_%28video_game%29
+[3]: http://www.valvesoftware.com/
+[4]: http://threejs.org/
