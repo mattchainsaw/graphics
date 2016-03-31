@@ -2,19 +2,19 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fun stuff</title>
+    <title>Port Hole</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r75/three.min.js"></script>
-    <script src="http://threejs.org/examples/js/controls/OrbitControls.js"></script>
-    <script src="http://math.slu.edu/~clair/graphics/demo/src/OBJLoader.js"></script>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
-    </style>
+    <script src="js/PointerLockControls.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/porthole.css">
 </head>
 <body>
-<script src="final-project.js"></script>
+    <div id="blocker">
+        <div id="instructions">
+            <span style="font-size:40px">Click to play</span>
+            <br />
+            (W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+        </div>
+    </div>
+    <script src="js/porthole.js"></script>
 </body>
 </html>

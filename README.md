@@ -1,8 +1,9 @@
 # Port Hole
 
 Available [here][1].  
-Final Project for Saint Louis University, by Matthew Meyer.  
-CSCI 3820 - Computer Graphics
+Final Project for CSCI 3820 - Computer Graphics  
+Matthew Meyer  
+Saint Louis University
 
 ## Table of Contents
 **[Overview](#overview)**  
