@@ -6,8 +6,12 @@ var WIDTH = window.innerWidth,
     HEIGHT = window.innerHeight,
     ASPECT = WIDTH / HEIGHT;
 
-var scene, cam, renderer, player;
+var PLAYER_HEIGHT = 10,
+    PLAYER_WALK_SPEED = 300,
+    PLAYER_JUMP_SPEED = 250;
 
+var scene, cam, renderer, player, objects = [], stats;
+var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0,-1,0), 0, 10);
 
 var blocker = document.getElementById('blocker');
 var instructions = document.getElementById('instructions');
@@ -25,18 +29,20 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     cam = new THREE.PerspectiveCamera(70, ASPECT, 0.1, 1000);
-    player = new THREE.PointerLockControls(cam);
-    player.enabled = true;
+    player = new THREE.PointerLockControls(cam, PLAYER_HEIGHT, PLAYER_WALK_SPEED, PLAYER_JUMP_SPEED);
 
     scene.add(player.getObject());
 
     loadAssets();
     initPointerLock();
+    getStats();
+
+    player.addEnvironment(objects);
 }
 
 function loadAssets() {
-    var geo = new THREE.CubeGeometry(7, 7, 7);
-    var mat = new THREE.MeshBasicMaterial({color: 0xff0000});
+    var geo = new THREE.CubeGeometry(PLAYER_HEIGHT, PLAYER_HEIGHT, PLAYER_HEIGHT);
+    var mat = new THREE.MeshBasicMaterial({color: 0x000000});
     var mesh = new THREE.Mesh(geo, mat);
     for (var i = -100; i <= 100; i += 10) {
         for (var j = -100; j <= 100; j += 10) {
@@ -44,8 +50,15 @@ function loadAssets() {
             m.material = mesh.material.clone();
             m.material.color.set(randomColor());
             m.position.x = i;
-            m.position.y = 0;
+            m.position.y = -PLAYER_HEIGHT/2;
+            if (Math.random() > 0.8) {
+                //if (Math.random() > 0.5)
+                    m.position.y += PLAYER_HEIGHT;
+                //else m.position.y -= PLAYER_HEIGHT;
+
+            }
             m.position.z = j;
+            objects.push(m);
             scene.add(m)
         }
     }
@@ -56,20 +69,19 @@ function initPointerLock() {
     var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
     if (havePointerLock) {
         var element = document.body;
-        var pointerlockchange = function (event) {
+        var pointerlockchange = function () {
             if (document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element) {
-                controlsEnabled = true;
-                controls.enabled = true;
+                player.enabled = true;
                 blocker.style.display = 'none';
             } else {
-                controls.enabled = false;
+                player.enabled = false;
                 blocker.style.display = '-webkit-box';
                 blocker.style.display = '-moz-box';
                 blocker.style.display = 'box';
                 instructions.style.display = '';
             }
         };
-        var pointerlockerror = function (event) {
+        var pointerlockerror = function () {
             instructions.style.display = '';
         };
         // Hook pointer lock state change events
@@ -79,12 +91,12 @@ function initPointerLock() {
         document.addEventListener('pointerlockerror', pointerlockerror, false);
         document.addEventListener('mozpointerlockerror', pointerlockerror, false);
         document.addEventListener('webkitpointerlockerror', pointerlockerror, false);
-        instructions.addEventListener('click', function (event) {
+        instructions.addEventListener('click', function () {
             instructions.style.display = 'none';
             // Ask the browser to lock the pointer
             element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
             if (/Firefox/i.test(navigator.userAgent)) {
-                var fullscreenchange = function (event) {
+                var fullscreenchange = function () {
                     if (document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element) {
                         document.removeEventListener('fullscreenchange', fullscreenchange);
                         document.removeEventListener('mozfullscreenchange', fullscreenchange);
@@ -105,9 +117,24 @@ function initPointerLock() {
 }
 
 function render() {
-    requestAnimationFrame(render);
-    renderer.render(scene, cam);
+    stats.begin();
+
+    raycaster.ray.origin.copy(player.getObject().position);
+    var intersections = raycaster.intersectObjects(objects);
+    player.isOnObject(intersections.length > 0);
+
     player.update();
+
+    if (player.isDead()) {
+        player.restart();
+        console.log('dead at ', player.getObject().position);
+    }
+
+    renderer.render(scene, cam);
+
+    stats.end();
+    requestAnimationFrame(render);
+
 }
 
 window.addEventListener('resize', function () {
@@ -127,3 +154,14 @@ function randomColor() {
     return Math.floor(Math.random() * 16777215);
 }
 
+function getStats() {
+    stats = new Stats();
+    stats.setMode(0); // 0: fps, 1: ms, 2: mb
+
+// align top-left
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0px';
+    stats.domElement.style.top = '0px';
+
+    document.body.appendChild( stats.domElement );
+}
