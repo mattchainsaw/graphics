@@ -124,7 +124,7 @@ THREE.PointerLockControls = function (camera, height, walkSpeed, jumpSpeed, term
 
     };
 
-    this.addEnvironment = function(env) {
+    this.addEnvironment = function (env) {
         environment = env;
     };
 
@@ -132,26 +132,6 @@ THREE.PointerLockControls = function (camera, height, walkSpeed, jumpSpeed, term
         isOnObject = boolean;
         canJump = boolean;
     };
-    //
-    //this.isBelowObject = function (boolean) {
-    //    if (boolean) velocity.y = Math.min(0, velocity.y);
-    //};
-    //this.isBehindObject = function (boolean) {
-    //    //if (boolean) velocity.z = Math.min(0,velocity.z);
-    //    moveForward = !boolean && moveForward;
-    //};
-    //this.isInFrontOfObject = function (boolean) {
-    //    //if (boolean) velocity.z = Math.max(0,velocity.z);
-    //    moveBackward = !boolean && moveBackward;
-    //};
-    //this.isLeftOfObject = function (boolean) {
-    //    //if (boolean) velocity.x = Math.min(0,velocity.x);
-    //    moveRight = !boolean && moveRight;
-    //};
-    //this.isRightOfObject = function (boolean) {
-    //    //if (boolean) velocity.x = Math.max(0,velocity.x);
-    //    moveLeft = !boolean && moveLeft;
-    //};
 
     this.getDirection = function () {
 
@@ -179,7 +159,7 @@ THREE.PointerLockControls = function (camera, height, walkSpeed, jumpSpeed, term
     };
 
     this.restart = function () {
-        yawObject.position.set(0, height, 0);
+        yawObject.position.set(0, 2 * height, 0);
         dead = false;
         velocity.set(0, 0, 0);
     };

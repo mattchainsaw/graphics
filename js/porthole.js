@@ -2,6 +2,19 @@
  * CSCI 3820 Final Project
  */
 
+level = [
+    [9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
+];
+
 var WIDTH = window.innerWidth,
     HEIGHT = window.innerHeight,
     ASPECT = WIDTH / HEIGHT;
@@ -11,7 +24,7 @@ var PLAYER_HEIGHT = 10,
     PLAYER_JUMP_SPEED = 250;
 
 var scene, cam, renderer, player, objects = [], stats;
-var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0,-1,0), 0, 10);
+var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
 
 var blocker = document.getElementById('blocker');
 var instructions = document.getElementById('instructions');
@@ -44,22 +57,22 @@ function loadAssets() {
     var geo = new THREE.CubeGeometry(PLAYER_HEIGHT, PLAYER_HEIGHT, PLAYER_HEIGHT);
     var mat = new THREE.MeshBasicMaterial({color: 0x000000});
     var mesh = new THREE.Mesh(geo, mat);
-    for (var i = -100; i <= 100; i += 10) {
-        for (var j = -100; j <= 100; j += 10) {
-            var m = mesh.clone();
-            m.material = mesh.material.clone();
-            m.material.color.set(randomColor());
-            m.position.x = i;
-            m.position.y = -PLAYER_HEIGHT/2;
-            if (Math.random() > 0.8) {
-                //if (Math.random() > 0.5)
-                    m.position.y += PLAYER_HEIGHT;
-                //else m.position.y -= PLAYER_HEIGHT;
+    for (var l = 0; l < 10; l++) {
+        for (var i = 0; i < 10; i++) {
+            for (var j = 0; j < 10; j++) {
+                if (level[i][j] > 0) {
+                    level[i][j]--;
 
+                    var m = mesh.clone();
+                    m.material = mesh.material.clone();
+                    m.material.color.set(randomColor());
+                    m.position.x = i * 10 - 50;
+                    m.position.y = l * 10 + PLAYER_HEIGHT;
+                    m.position.z = j * 10 - 50;
+                    objects.push(m);
+                    scene.add(m)
+                }
             }
-            m.position.z = j;
-            objects.push(m);
-            scene.add(m)
         }
     }
 
@@ -163,5 +176,5 @@ function getStats() {
     stats.domElement.style.left = '0px';
     stats.domElement.style.top = '0px';
 
-    document.body.appendChild( stats.domElement );
+    document.body.appendChild(stats.domElement);
 }
