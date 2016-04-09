@@ -20,8 +20,10 @@ var WIDTH = window.innerWidth,
     ASPECT = WIDTH / HEIGHT;
 
 var PLAYER_HEIGHT = 10,
+    PLAYER_WIDTH = 1;
     PLAYER_WALK_SPEED = 300,
-    PLAYER_JUMP_SPEED = 250;
+    PLAYER_JUMP_SPEED = 250,
+    PLAYER_TERMINAL_VELOCITY = 1000;
 
 var scene, cam, renderer, player, objects = [], stats;
 var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
@@ -42,7 +44,12 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     cam = new THREE.PerspectiveCamera(70, ASPECT, 0.1, 1000);
-    player = new THREE.PointerLockControls(cam, PLAYER_HEIGHT, PLAYER_WALK_SPEED, PLAYER_JUMP_SPEED);
+    player = new THREE.Player(cam);
+    player.walkSpeed = PLAYER_WALK_SPEED;
+    player.jumpSpeed = PLAYER_JUMP_SPEED;
+    player.width = PLAYER_WIDTH;
+    player.height = PLAYER_HEIGHT;
+    player.terminalVelocity = PLAYER_TERMINAL_VELOCITY;
 
     scene.add(player.getObject());
 

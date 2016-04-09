@@ -2,18 +2,27 @@
  * Adapted from PointerLockControls.js by mrdoob / http://mrdoob.com/
  */
 
-THREE.PointerLockControls = function (camera, height, walkSpeed, jumpSpeed, terminalVelocity) {
+THREE.Player = function (camera) {
 
     var scope = this;
 
     var environment = [];
 
-    height = height || 10;
-    walkSpeed = walkSpeed || 400;
-    jumpSpeed = jumpSpeed || 350;
-    terminalVelocity = terminalVelocity || 1000;
+    var height = 10;
+    var width = 1;
+    var walkSpeed = 400;
+    var jumpSpeed = 350;
+    var terminalVelocity = 1000;
+
+    var crossHair = new THREE.Mesh(
+        new THREE.RingGeometry(0.01,0.02),
+        new THREE.MeshPhongMaterial({color: 0x333333, transparent: true, opacity: 0.5})
+    );
+    crossHair.position.z -= width / 2;
+    //crossHair.position.y += 0.05;
 
     camera.rotation.set(0, 0, 0);
+    camera.add(crossHair);
 
     var pitchObject = new THREE.Object3D();
     pitchObject.add(camera);
@@ -32,10 +41,9 @@ THREE.PointerLockControls = function (camera, height, walkSpeed, jumpSpeed, term
     var dead = false;
 
     var prevTime = performance.now();
-
     var velocity = new THREE.Vector3();
-
     var PI_2 = Math.PI / 2;
+    var raycaster = new THREE.Raycaster();
 
     var onMouseMove = function (event) {
 
@@ -112,9 +120,26 @@ THREE.PointerLockControls = function (camera, height, walkSpeed, jumpSpeed, term
 
     };
 
+    var onMouseDown = function (event) {
+        if (scope.enabled === false) return;
+        console.log('click');
+        raycaster.ray.origin.copy(yawObject.position);
+        raycaster.ray.direction = scope.getDirection(new THREE.Vector3(0,0,-1)).normalize();
+        raycaster.far = 1000;
+        var intersections = raycaster.intersectObjects(environment);
+        if (intersections.length > 0) {
+            var location = intersections[0];
+            console.log(location);
+            location.object.material.color.setHex(0xffffff);
+            location.needsUpdate = true;
+        }
+
+    };
+
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
+    document.addEventListener('mousedown', onMouseDown, false);
 
     this.enabled = false;
 
@@ -164,7 +189,6 @@ THREE.PointerLockControls = function (camera, height, walkSpeed, jumpSpeed, term
         velocity.set(0, 0, 0);
     };
 
-    var raycaster = new THREE.Raycaster();
     this.update = function () {
 
         if (scope.enabled === false) return;
@@ -193,7 +217,7 @@ THREE.PointerLockControls = function (camera, height, walkSpeed, jumpSpeed, term
         }
 
         raycaster.ray.origin.copy(yawObject.position);
-        raycaster.far = velocity.distanceTo(yawObject.position) * delta + 1;
+        raycaster.far = velocity.distanceTo(yawObject.position) * delta + width;
         raycaster.near = 0;
         if (velocity.x > 0)
             raycaster.ray.direction.copy(new THREE.Vector3(1, 0, 0).applyQuaternion(yawObject.quaternion));
