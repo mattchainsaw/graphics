@@ -14,6 +14,9 @@ THREE.Player = function (camera) {
     var jumpSpeed = 350;
     var terminalVelocity = 1000;
 
+    var leftPortHole = new THREE.PortHole(scene, 0xff0000);
+    var rightPortHole = new THREE.PortHole(scene, 0x0000ff);
+
     var crossHair = new THREE.Mesh(
         new THREE.RingGeometry(0.01,0.02),
         new THREE.MeshPhongMaterial({color: 0x333333, transparent: true, opacity: 0.5})
@@ -122,16 +125,25 @@ THREE.Player = function (camera) {
 
     var onMouseDown = function (event) {
         if (scope.enabled === false) return;
-        console.log('click');
         raycaster.ray.origin.copy(yawObject.position);
         raycaster.ray.direction = scope.getDirection(new THREE.Vector3(0,0,-1)).normalize();
         raycaster.far = 1000;
         var intersections = raycaster.intersectObjects(environment);
         if (intersections.length > 0) {
             var location = intersections[0];
-            console.log(location);
-            location.object.material.color.setHex(0xffffff);
-            location.needsUpdate = true;
+            var direction = new THREE.Vector3().copy(location.point);
+            direction.addScaledVector(location.face.normal, 0.01);
+            var rotation = new THREE.Euler(0,0,0,"YXZ");
+            rotation.set(location.face.normal.y * -PI_2, location.face.normal.x * PI_2, PI_2);
+            console.log(rotation);
+            switch (event.which) {
+                case 1: // left click
+                    leftPortHole.shoot(direction, rotation);
+                    break;
+                case 3: // right click
+                    rightPortHole.shoot(direction, rotation);
+                    break;
+            }
         }
 
     };
@@ -146,6 +158,30 @@ THREE.Player = function (camera) {
     this.getObject = function () {
 
         return yawObject;
+
+    };
+
+    this.getLeftPortHole = function() {
+
+        return leftPortHole.getObject();
+
+    };
+
+    this.getLeftViewer = function() {
+
+        return leftPortHole.getViewer();
+
+    };
+
+    this.getRightPortHole = function() {
+
+        return rightPortHole.getObject();
+
+    };
+
+    this.getRightViewer = function() {
+
+        return rightPortHole.getViewer();
 
     };
 
@@ -189,7 +225,7 @@ THREE.Player = function (camera) {
         velocity.set(0, 0, 0);
     };
 
-    this.update = function () {
+    this.update = function (renderer, scene) {
 
         if (scope.enabled === false) return;
 
@@ -249,6 +285,9 @@ THREE.Player = function (camera) {
         }
 
         prevTime = time;
+
+        leftPortHole.update(renderer, scene);
+        rightPortHole.update(renderer, scene);
 
     };
 

@@ -20,7 +20,7 @@ var WIDTH = window.innerWidth,
     ASPECT = WIDTH / HEIGHT;
 
 var PLAYER_HEIGHT = 10,
-    PLAYER_WIDTH = 1;
+    PLAYER_WIDTH = 1,
     PLAYER_WALK_SPEED = 300,
     PLAYER_JUMP_SPEED = 250,
     PLAYER_TERMINAL_VELOCITY = 1000;
@@ -44,6 +44,7 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     cam = new THREE.PerspectiveCamera(70, ASPECT, 0.1, 1000);
+
     player = new THREE.Player(cam);
     player.walkSpeed = PLAYER_WALK_SPEED;
     player.jumpSpeed = PLAYER_JUMP_SPEED;
@@ -52,6 +53,10 @@ function init() {
     player.terminalVelocity = PLAYER_TERMINAL_VELOCITY;
 
     scene.add(player.getObject());
+    scene.add(player.getLeftPortHole());
+    scene.add(player.getRightPortHole());
+    scene.add(player.getLeftViewer());
+    scene.add(player.getRightViewer());
 
     loadAssets();
     initPointerLock();
@@ -143,7 +148,7 @@ function render() {
     var intersections = raycaster.intersectObjects(objects);
     player.isOnObject(intersections.length > 0);
 
-    player.update();
+    player.update(renderer, scene);
 
     if (player.isDead()) {
         player.restart();
