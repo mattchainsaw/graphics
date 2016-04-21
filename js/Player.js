@@ -148,18 +148,21 @@ THREE.Player = function (camera) {
             console.log(norm);
             var look = new THREE.Vector3().copy(point);
             look.addScaledVector(norm);
-            //var temp = look.x;
-            //look.x = look.y;
-            //look.y = temp;
 
             var rotation = new THREE.Euler(0, 0, 0);
             rotation.set(norm.y * PI_2, norm.x * PI_2, 0);
+            if (norm.z < 0) {
+                rotation.set(rotation.x + Math.PI, rotation.y, 0);
+            }
+            if (norm.y > 0) {
+                rotation.set(rotation.x, rotation.y + Math.PI, 0);
+            }
             switch (event.which) {
                 case 1: // left click
-                    leftPortHole.shoot(point, rotation, look, norm);
+                    leftPortHole.shoot(point, rotation, norm);
                     break;
                 case 3: // right click
-                    rightPortHole.shoot(point, rotation, look, norm);
+                    rightPortHole.shoot(point, rotation, norm);
                     break;
             }
         }
