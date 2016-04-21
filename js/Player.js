@@ -11,18 +11,24 @@ THREE.Player = function (camera) {
     var height = 10;
     var width = 1;
     var walkSpeed = 400;
-    var jumpSpeed = 350;
+    var jumpSpeed = 200;
     var terminalVelocity = 1000;
 
     var leftPortHole = new THREE.PortHole(scene, 0xff0000);
     var rightPortHole = new THREE.PortHole(scene, 0x0000ff);
+    leftPortHole.setViewer(rightPortHole.getViewer());
+    rightPortHole.setViewer(leftPortHole.getViewer());
+    leftPortHole.getObject().name = 'left';
+    rightPortHole.getObject().name = 'right';
+
+    var portalEntered = new THREE.Clock(true);
+    var prevPortalTime = portalEntered.getElapsedTime();
 
     var crossHair = new THREE.Mesh(
-        new THREE.RingGeometry(0.01,0.02),
+        new THREE.RingGeometry(0.01, 0.02),
         new THREE.MeshPhongMaterial({color: 0x333333, transparent: true, opacity: 0.5})
     );
     crossHair.position.z -= width / 2;
-    //crossHair.position.y += 0.05;
 
     camera.rotation.set(0, 0, 0);
     camera.add(crossHair);
@@ -33,6 +39,10 @@ THREE.Player = function (camera) {
     var yawObject = new THREE.Object3D();
     yawObject.position.y = 2 * height;
     yawObject.add(pitchObject);
+
+
+    var temp = new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshBasicMaterial({color: 0xffffff}));
+    yawObject.add(temp);
 
     var moveForward = false;
     var moveBackward = false;
@@ -126,22 +136,30 @@ THREE.Player = function (camera) {
     var onMouseDown = function (event) {
         if (scope.enabled === false) return;
         raycaster.ray.origin.copy(yawObject.position);
-        raycaster.ray.direction = scope.getDirection(new THREE.Vector3(0,0,-1)).normalize();
+        raycaster.ray.direction = scope.getDirection(new THREE.Vector3(0, 0, -1)).normalize();
         raycaster.far = 1000;
         var intersections = raycaster.intersectObjects(environment);
         if (intersections.length > 0) {
             var location = intersections[0];
-            var direction = new THREE.Vector3().copy(location.point);
-            direction.addScaledVector(location.face.normal, 0.01);
-            var rotation = new THREE.Euler(0,0,0,"YXZ");
-            rotation.set(location.face.normal.y * -PI_2, location.face.normal.x * PI_2, PI_2);
-            console.log(rotation);
+            var point = new THREE.Vector3().copy(location.point);
+            var norm = new THREE.Vector3().copy(location.face.normal);
+            console.log(point);
+            point.addScaledVector(norm, event.which == 1 ? 0.02 : 0.03);
+            console.log(norm);
+            var look = new THREE.Vector3().copy(point);
+            look.addScaledVector(norm);
+            //var temp = look.x;
+            //look.x = look.y;
+            //look.y = temp;
+
+            var rotation = new THREE.Euler(0, 0, 0);
+            rotation.set(norm.y * PI_2, norm.x * PI_2, 0);
             switch (event.which) {
                 case 1: // left click
-                    leftPortHole.shoot(direction, rotation);
+                    leftPortHole.shoot(point, rotation, look, norm);
                     break;
                 case 3: // right click
-                    rightPortHole.shoot(direction, rotation);
+                    rightPortHole.shoot(point, rotation, look, norm);
                     break;
             }
         }
@@ -161,25 +179,25 @@ THREE.Player = function (camera) {
 
     };
 
-    this.getLeftPortHole = function() {
+    this.getLeftPortHole = function () {
 
         return leftPortHole.getObject();
 
     };
 
-    this.getLeftViewer = function() {
+    this.getLeftViewer = function () {
 
         return leftPortHole.getViewer();
 
     };
 
-    this.getRightPortHole = function() {
+    this.getRightPortHole = function () {
 
         return rightPortHole.getObject();
 
     };
 
-    this.getRightViewer = function() {
+    this.getRightViewer = function () {
 
         return rightPortHole.getViewer();
 
@@ -187,6 +205,8 @@ THREE.Player = function (camera) {
 
     this.addEnvironment = function (env) {
         environment = env;
+        environment.push(leftPortHole.getObject());
+        environment.push(rightPortHole.getObject());
     };
 
     this.isOnObject = function (boolean) {
@@ -235,7 +255,7 @@ THREE.Player = function (camera) {
         velocity.x -= velocity.x * 10.0 * delta;
         velocity.z -= velocity.z * 10.0 * delta;
 
-        velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+        velocity.y -= 9.8 * 75.0 * delta; // 100.0 = mass
         if (velocity.y < -terminalVelocity) { // falling
             velocity.y = -terminalVelocity;
         }
@@ -262,6 +282,33 @@ THREE.Player = function (camera) {
         var intersections = raycaster.intersectObjects(environment);
         if (intersections.length == 0) {
             yawObject.translateX(velocity.x * delta);
+        }
+        else {
+            if (intersections[0].distance < width+ 0.5) {
+                if (intersections[0].object.name === 'left') {
+                    if (portalEntered.getElapsedTime() > prevPortalTime) {
+                        prevPortalTime = portalEntered.getElapsedTime();
+                        var move = new THREE.Vector3().copy(leftPortHole.getObject().position);
+                        move.sub(rightPortHole.getObject().position);
+                        move.add(rightPortHole.normal);
+                        yawObject.translateX(move.x);
+                        yawObject.translateY(move.y);
+                        yawObject.translateZ(move.z);
+                    }
+                }
+                else if (intersections[0].object.name === 'right') {
+                    if (portalEntered.getElapsedTime() > prevPortalTime) {
+                        prevPortalTime = portalEntered.getElapsedTime();
+                        var move = new THREE.Vector3().copy(leftPortHole.getObject().position);
+                        move.sub(rightPortHole.getObject().position);
+                        move.add(rightPortHole.normal);
+                        yawObject.translateX(move.x);
+                        yawObject.translateY(move.y);
+                        yawObject.translateZ(move.z);
+                    }
+
+                }
+            }
         }
 
         yawObject.translateY(velocity.y * delta);

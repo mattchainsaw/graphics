@@ -3,7 +3,7 @@
  */
 
 level = [
-    [9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [0, 9, 9, 9, 9, 9, 9, 9, 9, 0],
     [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
     [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
     [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
@@ -12,7 +12,7 @@ level = [
     [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
     [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
     [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [9, 9, 9, 9, 9, 9, 9, 9, 9, 9]
+    [0, 9, 9, 9, 9, 9, 9, 9, 9, 0]
 ];
 
 var WIDTH = window.innerWidth,
@@ -63,9 +63,14 @@ function init() {
     getStats();
 
     player.addEnvironment(objects);
+
+
 }
 
 function loadAssets() {
+    var axisHelper = new THREE.AxisHelper( 100 );
+    axisHelper.position.y = 20;
+    scene.add(axisHelper);
     var geo = new THREE.CubeGeometry(PLAYER_HEIGHT, PLAYER_HEIGHT, PLAYER_HEIGHT);
     var mat = new THREE.MeshBasicMaterial({color: 0x000000});
     var mesh = new THREE.Mesh(geo, mat);
@@ -82,7 +87,7 @@ function loadAssets() {
                     m.position.y = l * 10 + PLAYER_HEIGHT;
                     m.position.z = j * 10 - 50;
                     objects.push(m);
-                    scene.add(m)
+                    scene.add(m);
                 }
             }
         }
