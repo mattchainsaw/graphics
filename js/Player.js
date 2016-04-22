@@ -290,24 +290,16 @@ THREE.Player = function (camera) {
             if (intersections[0].distance < width+ 0.5) {
                 if (intersections[0].object.name === 'left') {
                     if (portalEntered.getElapsedTime() > prevPortalTime) {
-                        prevPortalTime = portalEntered.getElapsedTime();
-                        var move = new THREE.Vector3().copy(leftPortHole.getObject().position);
-                        move.sub(rightPortHole.getObject().position);
-                        move.add(rightPortHole.normal);
-                        yawObject.translateX(move.x);
-                        yawObject.translateY(move.y);
-                        yawObject.translateZ(move.z);
+                        prevPortalTime = portalEntered.getElapsedTime() + 1;
+                        var to = new THREE.Vector3().copy(rightPortHole.getObject().position).add(rightPortHole.normal);
+                        yawObject.position.copy(to);
                     }
                 }
                 else if (intersections[0].object.name === 'right') {
                     if (portalEntered.getElapsedTime() > prevPortalTime) {
-                        prevPortalTime = portalEntered.getElapsedTime();
-                        var move = new THREE.Vector3().copy(leftPortHole.getObject().position);
-                        move.sub(rightPortHole.getObject().position);
-                        move.add(rightPortHole.normal);
-                        yawObject.translateX(move.x);
-                        yawObject.translateY(move.y);
-                        yawObject.translateZ(move.z);
+                        prevPortalTime = portalEntered.getElapsedTime() + 1;
+                        var to = new THREE.Vector3().copy(leftPortHole.getObject().position).add(leftPortHole.normal);
+                        yawObject.position.copy(to);
                     }
 
                 }
@@ -323,6 +315,25 @@ THREE.Player = function (camera) {
         intersections = raycaster.intersectObjects(environment);
         if (intersections.length == 0) {
             yawObject.translateZ(velocity.z * delta);
+        }
+        else {
+            if (intersections[0].distance < width+ 0.5) {
+                if (intersections[0].object.name === 'left') {
+                    if (portalEntered.getElapsedTime() > prevPortalTime) {
+                        prevPortalTime = portalEntered.getElapsedTime() + 1;
+                        var to = new THREE.Vector3().copy(rightPortHole.getObject().position).add(rightPortHole.normal);
+                        yawObject.position.copy(to);
+                    }
+                }
+                else if (intersections[0].object.name === 'right') {
+                    if (portalEntered.getElapsedTime() > prevPortalTime) {
+                        prevPortalTime = portalEntered.getElapsedTime() + 1;
+                        var to = new THREE.Vector3().copy(leftPortHole.getObject().position).add(leftPortHole.normal);
+                        yawObject.position.copy(to);
+                    }
+
+                }
+            }
         }
 
         if (yawObject.position.y < -50) {

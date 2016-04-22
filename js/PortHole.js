@@ -19,7 +19,11 @@ THREE.PortHole = function(scene, color) {
         this.normal = normal;
         this.arrow.position.copy(position);
         this.arrow.setDirection(normal);
-        //portal.rotation.copy(rotation);
+        portal.lookAt(new THREE.Vector3().addVectors(position, normal));
+    };
+
+    var turn = function(turns) {
+        portal.rotateY(turns * Math.PI / 2)
     };
 
     this.getObject = function () {
