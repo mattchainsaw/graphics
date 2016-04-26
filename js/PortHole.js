@@ -6,9 +6,16 @@ THREE.PortHole = function(scene, color) {
     var other_portal;
     this.arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 20, 0x336688);
 
-    var geometry = new THREE.RingGeometry(0.0001, 8);
+    var geometry = new THREE.RingGeometry(0.001, 8);
+    var rimGeometry = new THREE.RingGeometry(7.8, 8.3);
     var material = new THREE.MeshPhongMaterial();
+    var rimMaterial = new THREE.MeshBasicMaterial({color: color});
+    rimMaterial.transparent = true;
+    rimMaterial.opacity = 0.4;
     var body = new THREE.Mesh(geometry, material);
+    var rim = new THREE.Mesh(rimGeometry, rimMaterial);
+    rim.position.z = 0.001;
+    body.add(rim);
     this.normal = new THREE.Vector3();
 
     this.shoot = function (position, rotation, normal) {
