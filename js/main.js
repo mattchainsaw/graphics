@@ -2,19 +2,6 @@
  * CSCI 3820 Final Project
  */
 
-level = [
-    [0, 9, 9, 9, 9, 9, 9, 9, 9, 0],
-    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [9, 1, 1, 1, 1, 1, 1, 1, 1, 9],
-    [0, 9, 9, 9, 9, 9, 9, 9, 9, 0]
-];
-
 var WIDTH = window.innerWidth,
     HEIGHT = window.innerHeight,
     ASPECT = WIDTH / HEIGHT;
@@ -68,27 +55,49 @@ function init() {
 }
 
 function loadAssets() {
-    var geo = new THREE.CubeGeometry(PLAYER_HEIGHT, PLAYER_HEIGHT, PLAYER_HEIGHT);
-    var mat = new THREE.MeshBasicMaterial({color: 0x000000});
-    var mesh = new THREE.Mesh(geo, mat);
-    for (var l = 0; l < 10; l++) {
-        for (var i = 0; i < 10; i++) {
-            for (var j = 0; j < 10; j++) {
-                if (level[i][j] > 0) {
-                    level[i][j]--;
 
-                    var m = mesh.clone();
-                    m.material = mesh.material.clone();
-                    m.material.color.set(randomColor());
-                    m.position.x = i * 10 - 50;
-                    m.position.y = l * 10 + PLAYER_HEIGHT;
-                    m.position.z = j * 10 - 50;
-                    objects.push(m);
-                    scene.add(m);
-                }
-            }
-        }
-    }
+    var texLoader = new THREE.TextureLoader();
+
+    var wallTex = texLoader.load('assets/wall.jpg');
+    wallTex.minFilter = THREE.LinearMipMapLinearFilter;
+    wallTex.wrapS = THREE.RepeatWrapping;
+    wallTex.wrapT = THREE.RepeatWrapping;
+    wallTex.repeat.set(3,3);
+    var floorTex = texLoader.load('assets/floor.jpg');
+    floorTex.minFilter = THREE.LinearFilter;
+    floorTex.wrapS = THREE.RepeatWrapping;
+    floorTex.wrapT = THREE.RepeatWrapping;
+    floorTex.repeat.set(3,3);
+
+    var wallMat = new THREE.MeshPhongMaterial({side: THREE.DoubleSide});
+    wallMat.map = wallTex;
+    var floorMat = new THREE.MeshPhongMaterial({side: THREE.DoubleSide});
+    floorMat.map = floorTex;
+
+    var wallGeo = new THREE.PlaneGeometry(100,100);
+    var frontWall = new THREE.Mesh(wallGeo, wallMat);
+    var backWall = new THREE.Mesh(wallGeo, wallMat);
+    var leftWall = new THREE.Mesh(wallGeo, wallMat);
+    var rightWall = new THREE.Mesh(wallGeo, wallMat);
+    var floor = new THREE.Mesh(wallGeo, floorMat);
+    frontWall.translateZ(-50);
+    frontWall.translateY(50);
+    backWall.translateZ(50);
+    backWall.translateY(50);
+    leftWall.translateX(-50);
+    leftWall.translateY(50);
+    rightWall.translateX(50);
+    rightWall.translateY(50);
+    leftWall.rotateY(Math.PI / 2);
+    rightWall.rotateY(-Math.PI / 2);
+    backWall.rotateY(Math.PI);
+    floor.rotateX(-Math.PI/2);
+
+    scene.add(frontWall); objects.push(frontWall);
+    scene.add(backWall); objects.push(backWall);
+    scene.add(leftWall); objects.push(leftWall);
+    scene.add(rightWall); objects.push(rightWall);
+    scene.add(floor); objects.push(floor);
 
 }
 

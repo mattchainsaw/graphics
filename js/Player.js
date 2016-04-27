@@ -141,8 +141,9 @@ THREE.Player = function (camera) {
         var intersections = raycaster.intersectObjects(environment);
         if (intersections.length > 0) {
             var location = intersections[0];
+            console.log(location);
             var point = new THREE.Vector3().copy(location.point);
-            var norm = new THREE.Vector3().copy(location.face.normal);
+            var norm = new THREE.Vector3().copy(location.face.normal).applyQuaternion(location.object.quaternion);
             point.addScaledVector(norm, event.which == 1 ? 0.02 : 0.03);
             var look = new THREE.Vector3().copy(point);
             look.addScaledVector(norm);
@@ -292,8 +293,8 @@ THREE.Player = function (camera) {
 
         prevTime = time;
 
-        leftPortHole.update(renderer, scene, yawObject.position);
-        rightPortHole.update(renderer, scene, yawObject.position);
+        leftPortHole.update(renderer, scene);
+        rightPortHole.update(renderer, scene);
 
     };
 

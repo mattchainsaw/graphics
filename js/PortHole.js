@@ -29,12 +29,10 @@ THREE.PortHole = function(scene, color) {
         body.rotation.copy(rotation);
         portal.position.copy(position);
         portal.scale.x = -1; // for mirror
+        if (normal.z == -1) other_portal.scale.y = -1; // for back wall
+        else other_portal.scale.y = 1;
         this.normal = normal;
         portal.lookAt(new THREE.Vector3().addVectors(position, normal));
-    };
-
-    var turn = function(turns) {
-        portal.rotateY(turns * Math.PI / 2)
     };
 
     this.getObject = function () {
@@ -50,16 +48,8 @@ THREE.PortHole = function(scene, color) {
         body.material.envMap = other_portal.renderTarget;
     };
 
-    var added = false;
-    this.update = function(renderer, scene, player) {
-        //portal.lookAt(player);
-        //other_portal.lookAt(player);
+    this.update = function(renderer, scene) {
         renderer.render(scene, other_portal, renderTarget);
-        if (!added) {
-            scene.add(this.arrow);
-            added = true;
-        }
-
     };
 
 };
