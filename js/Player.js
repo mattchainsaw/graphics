@@ -292,8 +292,8 @@ THREE.Player = function (camera) {
 
         prevTime = time;
 
-        leftPortHole.update(renderer, scene);
-        rightPortHole.update(renderer, scene);
+        leftPortHole.update(renderer, scene, yawObject.position);
+        rightPortHole.update(renderer, scene, yawObject.position);
 
     };
 

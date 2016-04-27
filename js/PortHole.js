@@ -1,13 +1,20 @@
 
 THREE.PortHole = function(scene, color) {
 
-    var portal = new THREE.CubeCamera(0.1, 100, 1024);
+    var portal = new THREE.PerspectiveCamera(40,1,0.1,1000);
+    var renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight,
+        {format: THREE.RGBFormat, magFilter: THREE.LinearMipMapLinearFilter, minFilter: THREE.LinearMipMapLinearFilter});
+    portal.renderTarget = renderTarget;
     var other_portal;
-    this.arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 20, 0x336688);
 
     var geometry = new THREE.RingGeometry(0.001, 8);
     var rimGeometry = new THREE.RingGeometry(7.8, 8.3);
-    var material = new THREE.MeshPhongMaterial();
+    var material = new THREE.ShaderMaterial({
+        uniforms: {tDiffuse: {type: 't', value: renderTarget}},
+        vertexShader: document.getElementById('vertexShader').textContent,
+        fragmentShader: document.getElementById('fragment_shader_screen').textContent,
+        depthWrite: true
+    });
     var rimMaterial = new THREE.MeshBasicMaterial({color: color});
     rimMaterial.transparent = true;
     rimMaterial.opacity = 0.4;
@@ -23,8 +30,6 @@ THREE.PortHole = function(scene, color) {
         portal.position.copy(position);
         portal.scale.x = -1; // for mirror
         this.normal = normal;
-        this.arrow.position.copy(position);
-        this.arrow.setDirection(normal);
         portal.lookAt(new THREE.Vector3().addVectors(position, normal));
     };
 
@@ -46,8 +51,10 @@ THREE.PortHole = function(scene, color) {
     };
 
     var added = false;
-    this.update = function(renderer, scene) {
-        portal.updateCubeMap(renderer, scene);
+    this.update = function(renderer, scene, player) {
+        //portal.lookAt(player);
+        //other_portal.lookAt(player);
+        renderer.render(scene, other_portal, renderTarget);
         if (!added) {
             scene.add(this.arrow);
             added = true;
