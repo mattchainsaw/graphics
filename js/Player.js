@@ -14,8 +14,8 @@ THREE.Player = function (camera) {
     var jumpSpeed = 200;
     var terminalVelocity = 1000;
 
-    var leftPortHole = new THREE.PortHole(scene, 0xff0000);
-    var rightPortHole = new THREE.PortHole(scene, 0x0000ff);
+    var leftPortHole = new THREE.PortHole(scene, 0x0000ff);
+    var rightPortHole = new THREE.PortHole(scene, 0xee8844);
     leftPortHole.setViewer(rightPortHole.getViewer());
     rightPortHole.setViewer(leftPortHole.getViewer());
     leftPortHole.getObject().name = 'left';
@@ -143,9 +143,7 @@ THREE.Player = function (camera) {
             var location = intersections[0];
             var point = new THREE.Vector3().copy(location.point);
             var norm = new THREE.Vector3().copy(location.face.normal);
-            console.log(point);
             point.addScaledVector(norm, event.which == 1 ? 0.02 : 0.03);
-            console.log(norm);
             var look = new THREE.Vector3().copy(point);
             look.addScaledVector(norm);
 
@@ -299,6 +297,15 @@ THREE.Player = function (camera) {
 
     };
 
+    var rotationDiff = function(enterNorm, exitNorm) {
+        var dot = enterNorm.dot(exitNorm);
+        var angle = -Math.PI + Math.acos(dot);
+        var cross = new THREE.Vector3();
+        cross.crossVectors(enterNorm, exitNorm);
+        if (cross.y < 0) angle = -angle;
+        return angle;
+    };
+
     var move = function (vel, dir) {
         var vec = new THREE.Vector3();
         vec[dir] = 1;
@@ -322,16 +329,23 @@ THREE.Player = function (camera) {
                     if (portalEntered.getElapsedTime() > prevPortalTime) {
                         prevPortalTime = portalEntered.getElapsedTime() + 1;
                         var to = new THREE.Vector3().copy(rightPortHole.getObject().position).add(rightPortHole.normal);
+                        var angle = rotationDiff(leftPortHole.normal, rightPortHole.normal);
                         yawObject.position.copy(to);
+                        yawObject.rotation.y += angle;
+                        if (yawObject.rotation.y > 2 * Math.PI) yawObject.rotation.y -= 2 * Math.PI;
+                        if (yawObject.rotation.y < -2 * Math.PI) yawObject.rotation.y += 2 * Math.PI;
                     }
                 }
                 else if (intersections[0].object.name === 'right') {
                     if (portalEntered.getElapsedTime() > prevPortalTime) {
                         prevPortalTime = portalEntered.getElapsedTime() + 1;
                         var to = new THREE.Vector3().copy(leftPortHole.getObject().position).add(leftPortHole.normal);
+                        var angle = rotationDiff(rightPortHole.normal, leftPortHole.normal);
                         yawObject.position.copy(to);
+                        yawObject.rotation.y += angle;
+                        if (yawObject.rotation.y > 2 * Math.PI) yawObject.rotation.y -= 2 * Math.PI;
+                        if (yawObject.rotation.y < -2 * Math.PI) yawObject.rotation.y += 2 * Math.PI;
                     }
-
                 }
             }
         }

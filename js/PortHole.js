@@ -2,7 +2,6 @@
 THREE.PortHole = function(scene, color) {
 
     var portal = new THREE.CubeCamera(0.1, 100, 1024);
-    portal.renderTarget.texture.minFilter = THREE.LinearMipMapLinearFilter;
     var other_portal;
     this.arrow = new THREE.ArrowHelper(new THREE.Vector3(0,0,1), new THREE.Vector3(0,0,0), 20, 0x336688);
 
