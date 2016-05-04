@@ -5,6 +5,9 @@ Final Project for CSCI 3820 - Computer Graphics
 Matthew Meyer  
 Saint Louis University
 
+![alt text][logo]
+
+
 ## Table of Contents
 **[Overview](#overview)**  
 **[Controls](#controls)**  
@@ -73,3 +76,4 @@ of a building.
 [2]: https://en.wikipedia.org/wiki/Portal_%28video_game%29
 [3]: http://www.valvesoftware.com/
 [4]: http://threejs.org/
+[logo]: https://turing.slu.edu/~mmeyer71/csci3820/final-project/screencast.gif "In Game Play"
