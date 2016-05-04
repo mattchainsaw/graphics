@@ -302,7 +302,7 @@ THREE.Player = function (camera) {
             shotsFired = false;
             return true;
         }
-        else return shotsFired
+        return false;
 
     };
 

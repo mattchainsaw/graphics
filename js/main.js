@@ -12,7 +12,7 @@ var PLAYER_HEIGHT = 10,
     PLAYER_JUMP_SPEED = 250,
     PLAYER_TERMINAL_VELOCITY = 1000;
 
-var scene, cam, renderer, player, objects = [], stats, listener, portholeNoise;
+var scene, cam, renderer, player, objects = [], stats, listener, music, portholeNoise;
 var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
 
 var blocker = document.getElementById('blocker');
@@ -41,7 +41,7 @@ function init() {
     player.height = PLAYER_HEIGHT;
     player.terminalVelocity = PLAYER_TERMINAL_VELOCITY;
 
-    var music = new THREE.Audio(listener);
+    music = new THREE.Audio(listener);
     music.load('assets/CreamOnChrome.mp3');
     music.autoplay = true;
     music.setLoop(true);
@@ -63,7 +63,7 @@ function init() {
     scene.add(player.getLeftViewer());
     scene.add(player.getRightViewer());
 
-    loadAssets();
+    loadLevel();
     initPointerLock();
     getStats();
 
@@ -72,50 +72,19 @@ function init() {
 
 }
 
-function loadAssets() {
-
-    var texLoader = new THREE.TextureLoader();
-
-    var wallTex = texLoader.load('assets/wall.jpg');
-    wallTex.minFilter = THREE.LinearMipMapLinearFilter;
-    wallTex.wrapS = THREE.RepeatWrapping;
-    wallTex.wrapT = THREE.RepeatWrapping;
-    wallTex.repeat.set(3,3);
-    var floorTex = texLoader.load('assets/floor.jpg');
-    floorTex.minFilter = THREE.LinearFilter;
-    floorTex.wrapS = THREE.RepeatWrapping;
-    floorTex.wrapT = THREE.RepeatWrapping;
-    floorTex.repeat.set(3,3);
-
-    var wallMat = new THREE.MeshPhongMaterial({side: THREE.DoubleSide});
-    wallMat.map = wallTex;
-    var floorMat = new THREE.MeshPhongMaterial({side: THREE.DoubleSide});
-    floorMat.map = floorTex;
-
-    var wallGeo = new THREE.PlaneGeometry(100,100);
-    var frontWall = new THREE.Mesh(wallGeo, wallMat);
-    var backWall = new THREE.Mesh(wallGeo, wallMat);
-    var leftWall = new THREE.Mesh(wallGeo, wallMat);
-    var rightWall = new THREE.Mesh(wallGeo, wallMat);
-    var floor = new THREE.Mesh(wallGeo, floorMat);
-    frontWall.translateZ(-50);
-    frontWall.translateY(50);
-    backWall.translateZ(50);
-    backWall.translateY(50);
-    leftWall.translateX(-50);
-    leftWall.translateY(50);
-    rightWall.translateX(50);
-    rightWall.translateY(50);
-    leftWall.rotateY(Math.PI / 2);
-    rightWall.rotateY(-Math.PI / 2);
-    backWall.rotateY(Math.PI);
-    floor.rotateX(-Math.PI/2);
-
-    scene.add(frontWall); objects.push(frontWall);
-    scene.add(backWall); objects.push(backWall);
-    scene.add(leftWall); objects.push(leftWall);
-    scene.add(rightWall); objects.push(rightWall);
-    scene.add(floor); objects.push(floor);
+function loadLevel() {
+    var level = new Level();
+    var floor = level.getFloor();
+    var north = level.getNorthWalls();
+    var east = level.getEastWalls();
+    var south = level.getSouthWalls();
+    var west = level.getWestWalls();
+    scene.add(floor);
+    scene.add(north);
+    scene.add(east);
+    scene.add(south);
+    scene.add(west);
+    objects.push(floor, north, south, east, west);
 
 }
 
