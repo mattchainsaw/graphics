@@ -12,7 +12,7 @@ var PLAYER_HEIGHT = 10,
     PLAYER_JUMP_SPEED = 250,
     PLAYER_TERMINAL_VELOCITY = 1000;
 
-var scene, cam, renderer, player, objects = [], stats;
+var scene, cam, renderer, player, objects = [], stats, listener, portholeNoise;
 var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
 
 var blocker = document.getElementById('blocker');
@@ -31,6 +31,8 @@ function init() {
     document.body.appendChild(renderer.domElement);
 
     cam = new THREE.PerspectiveCamera(70, ASPECT, 0.1, 1000);
+    listener = new THREE.AudioListener();
+    cam.add(listener);
 
     player = new THREE.Player(cam);
     player.walkSpeed = PLAYER_WALK_SPEED;
@@ -38,6 +40,22 @@ function init() {
     player.width = PLAYER_WIDTH;
     player.height = PLAYER_HEIGHT;
     player.terminalVelocity = PLAYER_TERMINAL_VELOCITY;
+
+    var music = new THREE.Audio(listener);
+    music.load('assets/CreamOnChrome.mp3');
+    music.autoplay = true;
+    music.setLoop(true);
+    music.setVolume(0.5);
+
+    portholeNoise = new THREE.Audio(listener);
+    portholeNoise.load('assets/porthole.mp3');
+
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode == 77) { // M
+            if (music.isPlaying) music.pause();
+            else music.play();
+        }
+    });
 
     scene.add(player.getObject());
     scene.add(player.getLeftPortHole());
@@ -159,7 +177,12 @@ function render() {
     var intersections = raycaster.intersectObjects(objects);
     player.isOnObject(intersections.length > 0);
 
-    player.update(renderer, scene);
+    var shotsFired = player.update(renderer, scene);
+    if (shotsFired) {
+        if (portholeNoise.isPlaying)
+            portholeNoise.stop();
+        portholeNoise.play();
+    }
 
     if (player.isDead()) {
         player.restart();

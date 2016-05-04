@@ -2,6 +2,8 @@
  * Adapted from PointerLockControls.js by mrdoob / http://mrdoob.com/
  */
 
+var shotsFired = false;
+
 THREE.Player = function (camera) {
 
     var scope = this;
@@ -37,7 +39,7 @@ THREE.Player = function (camera) {
     pitchObject.add(camera);
 
     var yawObject = new THREE.Object3D();
-    yawObject.position.y = 2 * height;
+    yawObject.position.y = height;
     yawObject.add(pitchObject);
 
 
@@ -165,7 +167,7 @@ THREE.Player = function (camera) {
                     break;
             }
         }
-
+        shotsFired = true;
     };
 
     document.addEventListener('mousemove', onMouseMove, false);
@@ -295,6 +297,12 @@ THREE.Player = function (camera) {
 
         leftPortHole.update(renderer, scene);
         rightPortHole.update(renderer, scene);
+
+        if (shotsFired) {
+            shotsFired = false;
+            return true;
+        }
+        else return shotsFired
 
     };
 

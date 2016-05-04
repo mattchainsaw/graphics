@@ -23,6 +23,7 @@ THREE.PortHole = function(scene, color) {
     rim.position.z = 0.001;
     body.add(rim);
     this.normal = new THREE.Vector3();
+    body.position.y = -100; // outta the way
 
     this.shoot = function (position, rotation, normal) {
         body.position.copy(position);
