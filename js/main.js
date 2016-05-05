@@ -12,7 +12,7 @@ var PLAYER_HEIGHT = 10,
     PLAYER_JUMP_SPEED = 250,
     PLAYER_TERMINAL_VELOCITY = 1000;
 
-var scene, cam, renderer, player, objects = [], stats, listener, music, portholeNoise;
+var scene, cam, renderer, player, objects = [], stats, listener, music, portholeNoise, bloodBackground;
 var raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
 
 var blocker = document.getElementById('blocker');
@@ -41,14 +41,20 @@ function init() {
     player.height = PLAYER_HEIGHT;
     player.terminalVelocity = PLAYER_TERMINAL_VELOCITY;
 
+    var audioLoader = new THREE.AudioLoader();
     music = new THREE.Audio(listener);
-    music.load('assets/CreamOnChrome.mp3');
-    music.autoplay = true;
+
+    audioLoader.load('assets/CreamOnChrome.mp3', function (buf) {
+        music.setBuffer(buf);
+        music.autoplay = true;
+    });
     music.setLoop(true);
     music.setVolume(0.5);
 
     portholeNoise = new THREE.Audio(listener);
-    portholeNoise.load('assets/porthole.mp3');
+    audioLoader.load('assets/porthole.mp3', function (buf) {
+        portholeNoise.setBuffer(buf);
+    });
 
     document.addEventListener('keydown', function (event) {
         if (event.keyCode == 77) { // M
@@ -68,8 +74,18 @@ function init() {
     getStats();
 
     player.addEnvironment(objects);
-
-
+    player.blood = new THREE.AmbientLight(0xff0000);
+    player.blood.intensity = 0;
+    scene.add(player.blood);
+    bloodBackground = new THREE.Mesh(new THREE.CubeGeometry(900,900,900),
+        new THREE.MeshPhongMaterial({
+            color: 0xff0000,
+            transparent: true,
+            side: THREE.BackSide
+        })
+    );
+    bloodBackground.material.opacity = 0;
+    scene.add(bloodBackground);
 }
 
 function loadLevel() {
@@ -85,6 +101,7 @@ function loadLevel() {
     scene.add(south);
     scene.add(west);
     objects.push(floor, north, south, east, west);
+    scene.add(level.getSkyBox());
 
 }
 
@@ -153,16 +170,21 @@ function render() {
         portholeNoise.play();
     }
 
-    if (player.isDead()) {
-        player.restart();
-        console.log('dead at ', player.getObject().position);
+    if (player.blood.intensity > 0) {
+        player.blood.intensity -= 0.01;
+        bloodBackground.material.opacity -= 0.0025;
+        bloodBackground.material.needsUpdate = true;
     }
 
-    renderer.render(scene, cam);
-
-    stats.end();
+    if (player.isDead()) {
+        player.restart();
+        player.blood.intensity = 2;
+        bloodBackground.material.opacity = 0.5;
+        bloodBackground.material.needsUpdate = true;
+    }
     requestAnimationFrame(render);
-
+    renderer.render(scene, cam);
+    stats.end();
 }
 
 window.addEventListener('resize', function () {

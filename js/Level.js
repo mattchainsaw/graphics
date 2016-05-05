@@ -13,6 +13,7 @@ var boring = [
     [1, 0, 0, 1],
     [1, 1, 1, 1]
 ];
+var floorTex, wallTex;
 
 var Level = function (arr, offset) {
 
@@ -49,6 +50,24 @@ var Level = function (arr, offset) {
     this.getWestWalls = function () {
         return new THREE.Mesh(westGeometry, wallMaterial);
     };
+
+    this.getSkyBox = function () {
+        var urls = ['assets/posz.jpg', 'assets/negz.jpg', 'assets/posy.jpg',
+            'assets/negy.jpg', 'assets/posx.jpg', 'assets/negx.jpg'];
+        var textureCube = new THREE.CubeTextureLoader().load(urls);
+
+        var shader = THREE.ShaderLib["cube"];
+        shader.uniforms["tCube"].value = textureCube;
+        var material = new THREE.ShaderMaterial({
+            fragmentShader: shader.fragmentShader,
+            vertexShader: shader.vertexShader,
+            uniforms: shader.uniforms,
+            depthWrite: false,
+            side: THREE.BackSide,
+        });
+        return new THREE.Mesh(new THREE.CubeGeometry(1000, 1000, 1000), material);
+
+    }
 
 };
 
@@ -123,8 +142,8 @@ var texLoader = new THREE.TextureLoader();
 
 var getWallMaterial = function () {
 
-    var wallTex = texLoader.load('assets/wall.jpg');
-    wallTex.minFilter = THREE.LinearMipMapLinearFilter;
+    wallTex = texLoader.load('assets/wall.jpg');
+    wallTex.minFilter = THREE.LinearFilter;
     wallTex.wrapS = THREE.RepeatWrapping;
     wallTex.wrapT = THREE.RepeatWrapping;
     wallTex.repeat.set(3, 3);
@@ -137,7 +156,7 @@ var getWallMaterial = function () {
 
 var getFloorMaterial = function () {
 
-    var floorTex = texLoader.load('assets/floor.jpg');
+    floorTex = texLoader.load('assets/floor.jpg');
     floorTex.minFilter = THREE.LinearFilter;
     floorTex.wrapS = THREE.RepeatWrapping;
     floorTex.wrapT = THREE.RepeatWrapping;

@@ -243,10 +243,15 @@ THREE.Player = function (camera) {
 
     };
 
+    var deaths = 0;
     this.restart = function () {
+        deaths += 1;
         yawObject.position.set(0, 2 * height, 0);
         dead = false;
         velocity.set(0, 0, 0);
+        var marker = document.getElementById('lives-marker');
+        marker.innerHTML = "<strong>Deaths: " + deaths + "&nbsp;</strong>";
+
     };
 
     this.update = function (renderer, scene) {
